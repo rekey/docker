@@ -17,17 +17,25 @@ RUN set -x \
 RUN set -x \
 	&& adduser debian \
     && mkdir -p /home/debian \
-    && chown -R debian:debian /home/debian
+    && chown -R debian:debian /home/debian \
+    && su debian \
+    && cd /home/debian
 
 # 初始化 immortalwrt 目录
 RUN set -x \
-    && su debian \
-    && cd /home/debian \
     && git clone https://github.com/immortalwrt/immortalwrt \
     && cd immortalwrt \
-    && echo "src-git mihomo https://github.com/morytyann/OpenWrt-mihomo" >> feeds.conf.default \
+    && echo "src-git mihomo https://github.com/morytyann/OpenWrt-mihomo" >> feeds.conf.default
+
+RUN set -x \
     && ./scripts/feeds update -a \
-    && ./scripts/feeds install -a \
-    && make download -j$(nproc)
+    && ./scripts/feeds install -a
+
+RUN set -x \
+    && wget https://github.com/rekey/docker/raw/master/openwrt-base/init.config -O .config \
+    && make download -j$(nproc) \
+    && make V=s -j$(nproc)
+
+WORKDIR /home/debian
 
 CMD ["/bin/bash"]
