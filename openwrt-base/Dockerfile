@@ -1,5 +1,6 @@
 FROM debian:11
 
+# 环境配置
 RUN set -x \
 	&& apt update \
     && apt full-upgrade -y \
@@ -12,12 +13,19 @@ RUN set -x \
     python3-docutils python3-pyelftools qemu-utils re2c rsync scons squashfs-tools subversion swig \
     texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd zlib1g-dev zstd
 
+# 创建一般权限用户
 RUN set -x \
 	&& adduser debian \
     && mkdir -p /home/debian \
-    && chown -R debian:debian /home/debian \
+    && chown -R debian:debian /home/debian
+
+# 初始化 immortalwrt 目录
+RUN set -x \
     && su debian \
     && cd /home/debian \
-    && git clone https://github.com/immortalwrt/immortalwrt
+    && git clone https://github.com/immortalwrt/immortalwrt \
+    && cd immortalwrt \
+    && ./scripts/feeds update -a \
+    && ./scripts/feeds install -a
 
 CMD ["/bin/bash"]
