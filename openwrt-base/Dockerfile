@@ -13,6 +13,11 @@ RUN set -x \
     texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd zlib1g-dev zstd
 
 RUN set -x \
-	&& adduser debian && mkdir -p /home/debian && chown -R debian:debian /home/debian
+	&& adduser debian \
+    && mkdir -p /home/debian \
+    && chown -R debian:debian /home/debian \
+    && su debian \
+    && cd /home/debian \
+    && git clone https://github.com/immortalwrt/immortalwrt
 
 CMD ["/bin/bash"]
