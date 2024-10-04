@@ -25,7 +25,9 @@ RUN set -x \
     && cd /home/debian \
     && git clone https://github.com/immortalwrt/immortalwrt \
     && cd immortalwrt \
+    && echo "src-git mihomo https://github.com/morytyann/OpenWrt-mihomo" >> feeds.conf.default \
     && ./scripts/feeds update -a \
-    && ./scripts/feeds install -a
+    && ./scripts/feeds install -a \
+    && make download -j$(nproc)
 
 CMD ["/bin/bash"]
