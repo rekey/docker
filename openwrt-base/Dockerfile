@@ -17,9 +17,9 @@ RUN adduser builder \
     && mkdir -p /home/builder \
     && chown -R builder:builder /home/builder
 
-WORKDIR /home/builder
 USER builder
 
+WORKDIR /home/builder
 # 初始化 immortalwrt 目录
 RUN git clone https://github.com/immortalwrt/immortalwrt
 
