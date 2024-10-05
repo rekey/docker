@@ -18,13 +18,6 @@ RUN adduser builder \
     && chown -R builder:builder /home/builder
 
 USER builder
-
 WORKDIR /home/builder
-# 初始化 immortalwrt 目录
-RUN git clone https://github.com/immortalwrt/immortalwrt
-
-WORKDIR /home/builder/immortalwrt
-RUN ./scripts/feeds update -a
-RUN ./scripts/feeds install -a
 
 CMD ["/bin/bash"]
