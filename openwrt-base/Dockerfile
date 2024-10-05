@@ -1,8 +1,7 @@
 FROM debian:11
 
 # 环境配置
-RUN set -x \
-	&& apt update \
+RUN apt update \
     && apt full-upgrade -y \
     && apt install -y ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential \
     bzip2 ccache clang cmake cpio curl device-tree-compiler ecj fastjar flex gawk gettext gcc-multilib \
@@ -14,29 +13,33 @@ RUN set -x \
     texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd zlib1g-dev zstd
 
 # 创建一般权限用户
-RUN set -x \
-	&& adduser debian \
+RUN adduser debian \
     && mkdir -p /home/debian \
-    && chown -R debian:debian /home/debian \
-    && su debian
-    
-RUN set -x && cd /home/debian
+    && chown -R debian:debian /home/debian
 
 # 初始化 immortalwrt 目录
-RUN set -x && git clone https://github.com/immortalwrt/immortalwrt
+RUN su debian \
+    && cd /home/debian \
+    && git clone https://github.com/immortalwrt/immortalwrt
 
-RUN set -x && cd ./immortalwrt
+RUN su debian \
+    && cd /home/debian/immortalwrt \
+    && ./scripts/feeds update -a
 
-RUN set -x && ./scripts/feeds update -a
+RUN su debian \
+    && cd /home/debian/immortalwrt \
+    && ./scripts/feeds install -a
 
-RUN set -x && ./scripts/feeds install -a
+RUN su debian \
+    && cd /home/debian/immortalwrt \
+    && wget https://github.com/rekey/docker/raw/master/openwrt-base/init.config -O .config
 
-RUN set -x && wget https://github.com/rekey/docker/raw/master/openwrt-base/init.config -O .config
+RUN su debian \
+    && cd /home/debian/immortalwrt \
+    make download -j$(nproc)
 
-RUN set -x && make download -j$(nproc)
-
-RUN set -x && make V=s -j$(nproc)
-
-WORKDIR /home/debian
+RUN su debian \
+    && cd /home/debian/immortalwrt \
+    && make V=s -j$(nproc)
 
 CMD ["/bin/bash"]
