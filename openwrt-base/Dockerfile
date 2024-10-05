@@ -13,33 +13,14 @@ RUN apt update \
     texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd zlib1g-dev zstd
 
 # 创建一般权限用户
-RUN adduser debian \
-    && mkdir -p /home/debian \
-    && chown -R debian:debian /home/debian
+RUN adduser builder \
+    && mkdir -p /home/builder \
+    && chown -R builder:builder /home/builder
+
+WORKDIR /home/builder/immortalwrt
+USER builder
 
 # 初始化 immortalwrt 目录
-RUN su debian \
-    && cd /home/debian \
-    && git clone https://github.com/immortalwrt/immortalwrt
-
-RUN su debian \
-    && cd /home/debian/immortalwrt \
-    && ./scripts/feeds update -a
-
-RUN su debian \
-    && cd /home/debian/immortalwrt \
-    && ./scripts/feeds install -a
-
-RUN su debian \
-    && cd /home/debian/immortalwrt \
-    && wget https://github.com/rekey/docker/raw/master/openwrt-base/init.config -O .config
-
-RUN su debian \
-    && cd /home/debian/immortalwrt \
-    make download -j$(nproc)
-
-RUN su debian \
-    && cd /home/debian/immortalwrt \
-    && make V=s -j$(nproc)
+RUN git clone https://github.com/immortalwrt/immortalwrt
 
 CMD ["/bin/bash"]
